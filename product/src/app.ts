@@ -1,35 +1,35 @@
 import express from "express";
-import * as bodyParser from "body-parser";
-import Controller from "./controllers/controller";
+import { connectToDatabase } from "./services/database.service";
+import { router as products } from "./routes/products.router";
 
 class App {
   public app: express.Application;
   public port: number;
 
-  constructor(controllers: Controller[], port: number) {
+  constructor(port: number) {
     this.app = express();
     this.port = port;
 
     this.initializeMiddlewares();
-    this.initializeControllers(controllers);
   }
 
   private initializeMiddlewares(): void {
-    this.app.use(bodyParser.json());
-  }
-
-  private initializeControllers<Type>(controllers: Type[]): void {
-    controllers.forEach((controller: any) => {
-      this.app.use("/", controller.router);
-    });
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use("/products", products);
   }
 
   public listen(): void {
-    this.app.listen(this.port, () => {
-      console.log(
-        `⚡️[server]: Server is running at http://localhost:${this.port}`
-      );
-    });
+    connectToDatabase()
+      .then(() => {
+        this.app.listen(this.port, () => {
+          console.log(`Server started at http://localhost:${this.port}`);
+        });
+      })
+      .catch((error: Error) => {
+        console.error("Database connection failed", error);
+        process.exit();
+      });
   }
 }
 
