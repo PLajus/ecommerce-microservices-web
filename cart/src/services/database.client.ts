@@ -1,25 +1,21 @@
-import { RequestParams } from "../utils/requestParams";
+import { Cart } from "../models/cart";
 import { redis } from "./redis";
 
 class RedisClient {
-  // public async getUsersCart(userID: string) {
-  //   return await redis.hgetall(userID);
-  // }
-  public async getUsersCart(params: RequestParams) {
-    return await redis.hgetall(params["userid"]);
+  public async getUsersCart(cart: Cart) {
+    return await redis.hgetall(cart["userid"]);
   }
 
-  public async getProductQuantity(userID: string, productID: string) {
-    return await redis.hget(userID, productID);
+  public async getProductQuantity(cart: Cart) {
+    return await redis.hget(cart["userid"], cart["productid"]!);
   }
 
-  public async updateProduct(userID: string, productID: string, amount = 1) {
-    // console.log(userID, productID, amount);
-    return await redis.hset(userID, { productID: amount });
+  public async updateCart(userid: string, product: Object) {
+    return await redis.hset(userid, product);
   }
 
-  public async deleteProduct(userID: string, productID: string) {
-    return await redis.hdel(userID, productID);
+  public async deleteProduct(cart: Cart) {
+    return await redis.hdel(cart["userid"], cart["productid"]!);
   }
 }
 

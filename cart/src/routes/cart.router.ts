@@ -11,4 +11,6 @@ router.get("/:userid", cart.getCart);
 
 router.get("/:userid/:productid", cart.getAmountofProduct);
 
-router.put("/:userid/:productid/:amount?", cart.updateProductAmount);
+router.put("/:userid", cart.updateCart);
+
+router.delete("/:userid/:productid", cart.deleteProduct);
