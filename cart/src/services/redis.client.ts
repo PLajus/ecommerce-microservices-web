@@ -17,6 +17,9 @@ class RedisClient {
   public async deleteProduct(cart: Cart) {
     return await redis.hdel(cart["userid"], cart["productid"]!);
   }
+  public async deleteCart(userid: string) {
+    return await redis.del(userid);
+  }
 }
 
 export default RedisClient;
