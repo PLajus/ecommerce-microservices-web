@@ -1,15 +1,18 @@
 import "dotenv/config";
 import { Request, Response } from "express";
-import RedisClient from "../services/database.client";
+import RedisClient from "../services/redis.client";
 import { isEmpty } from "../utils/emptyObjectChecker";
 import { processRequestParams } from "../utils/requestParamsProcesser";
 
 class CartController {
-  async getCart(req: Request, res: Response) {
-    const redisClient = new RedisClient();
-    const params = processRequestParams(req);
+  redisClient: RedisClient;
+  constructor() {
+    this.redisClient = new RedisClient();
+  }
 
-    const cart = await redisClient.getUsersCart(params);
+  async getCart(req: Request, res: Response) {
+    const params = processRequestParams(req);
+    const cart = await this.redisClient.getUsersCart(params);
     if (!isEmpty(cart)) {
       res.status(200).send(cart);
     } else {
@@ -18,10 +21,8 @@ class CartController {
   }
 
   async getAmountofProduct(req: Request, res: Response) {
-    const redisClient = new RedisClient();
     const params = processRequestParams(req);
-
-    const cart = await redisClient.getProductQuantity(params);
+    const cart = await this.redisClient.getProductQuantity(params);
     if (!isEmpty(cart)) {
       res.status(200).send(cart);
     } else {
@@ -54,19 +55,31 @@ class CartController {
     const redisClient = new RedisClient();
     const params = processRequestParams(req);
 
-    const updatedProducts = await redisClient.deleteProduct(params);
-    if (updatedProducts) {
+    const deletedProducts = await redisClient.deleteProduct(params);
+    if (deletedProducts >= 0) {
       res
         .status(200)
         .send(
-          `Product ${req.params.productid} updated in users ${req.params.userid} cart`
+          `Product ${req.params.productid} deleted in users ${req.params.userid} cart`
         );
     } else {
       res
-        .status(404)
+        .status(400)
         .send(
-          `Unable to find product ${req.params.userid} in users ${req.params.productid} cart`
+          `Unable to delete product ${req.params.userid} in users ${req.params.productid} cart`
         );
+    }
+  }
+  async deleteCart(req: Request, res: Response) {
+    //TODO: add user auth check
+
+    const redisClient = new RedisClient();
+
+    const deletedCart = await redisClient.deleteCart(req?.params?.userid);
+    if (deletedCart) {
+      res.status(200).send(`Deleted users ${req.params.userid} cart`);
+    } else {
+      res.status(400).send(`Unable to delete users ${req.params.userid} cart`);
     }
   }
 }

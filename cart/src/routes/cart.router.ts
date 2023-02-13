@@ -3,14 +3,22 @@ import CartController from "../controllers/cart.controller";
 
 export const router = express.Router();
 
-const cart: CartController = new CartController();
+const cart = new CartController();
 
 router.use(express.json());
 
-router.get("/:userid", cart.getCart);
+router.get("/user/:userid", cart.getCart.bind(cart));
 
-router.get("/:userid/:productid", cart.getAmountofProduct);
+router.get(
+  "/user/:userid/product/:productid",
+  cart.getAmountofProduct.bind(cart)
+);
 
-router.put("/:userid", cart.updateCart);
+router.put("/user/:userid", cart.updateCart.bind(cart));
 
-router.delete("/:userid/:productid", cart.deleteProduct);
+router.delete("/user/:userid", cart.deleteCart.bind(cart));
+
+router.delete(
+  "/user/:userid/product/:productid",
+  cart.deleteProduct.bind(cart)
+);
