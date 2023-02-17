@@ -3,18 +3,18 @@ import { ObjectId } from "mongodb";
 import { collections } from "../services/database.service";
 import Product from "../models/product";
 
-class ProductsController {
+class ProductController {
   async getAllProducts(_req: Request, res: Response): Promise<void> {
     try {
       const products = (await collections
         .products!.find({})
         .toArray()) as unknown as Product[];
 
-      res.status(200).send(products);
+      res.status(200).json(products);
     } catch (error) {
       error instanceof Error
-        ? res.status(500).send(error.message)
-        : res.status(500).send("Something went wrong!");
+        ? res.status(500).json(error.message)
+        : res.status(500).json("Something went wrong!");
       console.error(error);
     }
   }
@@ -29,12 +29,12 @@ class ProductsController {
       )) as unknown as Product;
 
       if (product) {
-        res.status(200).send(product);
+        res.status(200).json(product);
       }
     } catch (error) {
       res
         .status(404)
-        .send(`Unable to find matching document with id: ${req.params.id}`);
+        .json(`Unable to find matching document with id: ${req.params.id}`);
     }
   }
 
@@ -46,14 +46,14 @@ class ProductsController {
       result
         ? res
             .status(201)
-            .send(
+            .json(
               `Successfully created a new product with id ${result.insertedId}`
             )
-        : res.status(500).send("Failed to create a new product.");
+        : res.status(500).json("Failed to create a new product.");
     } catch (error) {
       error instanceof Error
-        ? res.status(400).send(error.message)
-        : res.status(400).send("Something went wrong!");
+        ? res.status(400).json(error.message)
+        : res.status(400).json("Something went wrong!");
       console.error(error);
     }
   }
@@ -70,12 +70,12 @@ class ProductsController {
       });
 
       result
-        ? res.status(200).send(`Successfully updated product with id ${id}`)
-        : res.status(304).send(`Producr with id: ${id} not updated`);
+        ? res.status(200).json(`Successfully updated product with id ${id}`)
+        : res.status(304).json(`Producr with id: ${id} not updated`);
     } catch (error) {
       error instanceof Error
-        ? res.status(400).send(error.message)
-        : res.status(400).send("Something went wrong!");
+        ? res.status(400).json(error.message)
+        : res.status(400).json("Something went wrong!");
       console.error(error);
     }
   }
@@ -88,19 +88,19 @@ class ProductsController {
       const result = await collections.products!.deleteOne(query);
 
       if (result && result.deletedCount) {
-        res.status(202).send(`Successfully removed product with id ${id}`);
+        res.status(202).json(`Successfully removed product with id ${id}`);
       } else if (!result) {
-        res.status(400).send(`Failed to remove product with id ${id}`);
+        res.status(400).json(`Failed to remove product with id ${id}`);
       } else if (!result.deletedCount) {
-        res.status(404).send(`Product with id ${id} does not exist`);
+        res.status(404).json(`Product with id ${id} does not exist`);
       }
     } catch (error) {
       error instanceof Error
-        ? res.status(400).send(error.message)
-        : res.status(400).send("Something went wrong!");
+        ? res.status(400).json(error.message)
+        : res.status(400).json("Something went wrong!");
       console.error(error);
     }
   }
 }
 
-export default ProductsController;
+export default ProductController;
