@@ -1,9 +1,9 @@
 import express from "express";
-import ProductsController from "../controllers/products.controller";
+import ProductController from "../controllers/products.controller";
 
 export const router = express.Router();
 
-const products: ProductsController = new ProductsController();
+const products: ProductController = new ProductController();
 
 router.use(express.json());
 
