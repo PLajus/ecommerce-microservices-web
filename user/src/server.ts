@@ -1,36 +1,8 @@
-import express from "express";
-import { connectToDatabase } from "./services/database.service";
-import { router as products } from "./routes/products.router";
+import * as dotenv from "dotenv";
+import App from "./app";
 
-class App {
-  public app: express.Application;
-  public port: number;
+dotenv.config();
 
-  constructor(port: number) {
-    this.app = express();
-    this.port = port;
+const app = new App(+process.env.PORT!);
 
-    this.initializeMiddlewares();
-  }
-
-  private initializeMiddlewares(): void {
-    this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.use("/products", products);
-  }
-
-  public listen(): void {
-    connectToDatabase()
-      .then(() => {
-        this.app.listen(this.port, () => {
-          console.log(`Server started at http://localhost:${this.port}`);
-        });
-      })
-      .catch((error: Error) => {
-        console.error("Database connection failed", error);
-        process.exit();
-      });
-  }
-}
-
-export default App;
+app.listen();

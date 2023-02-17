@@ -1,6 +1,5 @@
 import express from "express";
-// import { connectToDatabase } from "./services/database.service";
-// import { router as products } from "./routes/products.router";
+import { router as users } from "./routes/user.router";
 
 class App {
   public app: express.Application;
@@ -16,7 +15,7 @@ class App {
   private initializeMiddlewares(): void {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    // this.app.use("/products", products);
+    this.app.use("/users", users);
   }
 
   public listen(): void {
