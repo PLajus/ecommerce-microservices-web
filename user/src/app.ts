@@ -1,4 +1,7 @@
 import express from "express";
+import session from "express-session";
+import mongoose from "mongoose";
+import passport from "passport";
 import { router as users } from "./routes/user.router";
 
 class App {
@@ -12,9 +15,34 @@ class App {
     this.initializeMiddlewares();
   }
 
+  public connectToDB(): void {
+    mongoose.set("strictQuery", false);
+    mongoose.connect(process.env.MONGO_URL!, () => {
+      console.log("Connected to MongoDB");
+    });
+  }
+
   private initializeMiddlewares(): void {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+
+    this.app.use(
+      session({
+        secret: process.env.SECRET!,
+        resave: false,
+        saveUninitialized: false,
+      })
+    );
+
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
+
+    require("./auth/auth");
+
+    //   "/user",
+    //   passport.authenticate("jwt", { session: false }),
+    //   secureUsers
+    // );
     this.app.use("/users", users);
   }
 

@@ -5,4 +5,5 @@ dotenv.config();
 
 const app = new App(+process.env.PORT!);
 
+app.connectToDB();
 app.listen();
