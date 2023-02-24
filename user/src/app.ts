@@ -39,10 +39,6 @@ class App {
 
     require("./auth/auth");
 
-    //   "/user",
-    //   passport.authenticate("jwt", { session: false }),
-    //   secureUsers
-    // );
     this.app.use("/users", users);
   }
 
