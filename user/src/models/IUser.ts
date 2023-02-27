@@ -5,5 +5,4 @@ export interface UserDoc extends mongoose.Document {
   password: string;
   lastActive: Date;
   status: string;
-  // isValidPassword: (password: string) => boolean;
 }
