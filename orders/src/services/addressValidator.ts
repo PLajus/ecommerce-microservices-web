@@ -9,25 +9,27 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const validateNewAddress = [
-  body("address.*.type").optional().isIn(["Shipping", "Billing"]),
-  body("address.*.street").not().isEmpty().isString(),
-  body("address.*.city").not().isEmpty().isString(),
-  body("address.*.state").optional().not().isEmpty().isString(),
-  body("address.*.postalCode").not().isEmpty().isPostalCode("any"),
-  body("address.*.country").not().isEmpty().isAlphanumeric(),
+  body("address").exists(),
+  body("address.type").optional().isIn(["Shipping", "Billing"]),
+  body("address.street").exists().not().isEmpty().isString(),
+  body("address.city").exists().not().isEmpty().isString(),
+  body("address.state").exists().optional().not().isEmpty().isString(),
+  body("address.postalCode").exists().not().isEmpty().isPostalCode("any"),
+  body("address.country").exists().not().isEmpty().isAlphanumeric(),
 
   validate,
 ];
 
 export const validateUpdateAddress = [
   param("id").exists(),
+  body("address").exists(),
   oneOf([
-    body("address.*.type").optional().isIn(["Shipping", "Billing"]),
-    body("address.*.street").not().isEmpty().isString(),
-    body("address.*.city").not().isEmpty().isString(),
-    body("address.*.state").optional().not().isEmpty().isString(),
-    body("address.*.postalCode").not().isEmpty().isPostalCode("any"),
-    body("address.*.country").not().isEmpty().isAlphanumeric(),
+    body("address.type").optional().isIn(["Shipping", "Billing"]),
+    body("address.street").exists().not().isEmpty().isString(),
+    body("address.city").exists().not().isEmpty().isString(),
+    body("address.state").exists().optional().not().isEmpty().isString(),
+    body("address.postalCode").exists().not().isEmpty().isPostalCode("any"),
+    body("address.country").exists().not().isEmpty().isAlphanumeric(),
   ]),
   validate,
 ];
