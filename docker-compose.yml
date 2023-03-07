@@ -1,0 +1,150 @@
+version: "1"
+services:
+  users:
+    build: ./users
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo/ecommerce
+
+  products:
+    build: ./products
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo/ecommerce
+
+  recommendations:
+    build: ./recommendations
+    ports:
+      - "3002:3000"
+    depends_on:
+      - neo4j
+    environment:
+      - DB_CONNECTION=bolt://neo4j:7687
+      - DB_USER=neo4j
+      - DB_PASS=password
+
+  advertisements:
+    build: ./advertisements
+    ports:
+      - "3003:3000"
+    depends_on:
+      - cassandra
+    environment:
+      - CONTACT_POINT=cassandra
+      - KEYSPACE=ecommerce
+      - LOCALDATACENTER=datacenter1
+
+  carts:
+    build: ./carts
+    ports:
+      - "3004:3000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  orders:
+    build: ./orders
+    ports:
+      - "3005:3000"
+    depends_on:
+      - mysql
+    environment:
+      - DB_TABLE=orders
+      - DB_USER=root
+      - DB_PASS=password
+      - DB_HOST=mysql
+
+  user-logs:
+    build: ./user-logs
+    ports:
+      - "3006:3000"
+    depends_on:
+      - cassandra
+    environment:
+      - CONTACT_POINT=cassandra
+      - KEYSPACE=ecommerce
+      - LOCALDATACENTER=datacenter1
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - "polyglot-mongo:/data/db"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      #   # ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      #   # ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      - ME_CONFIG_MONGODB_SERVER=mongo
+
+  neo4j:
+    image: neo4j
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - "neo4j:/data"
+
+  redis:
+    image: redis/redis-stack
+    restart: always
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - "redis:/data"
+
+  mysql:
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - "polyglot-mysql:/var/lib/mysql"
+
+  cassandra:
+    image: bitnami/cassandra
+    restart: always
+    ports:
+      - "9042:9042"
+    volumes:
+      - "cassandra:/bitnami"
+
+  nginx:
+    image: nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./default.conf:/etc/nginx/conf.d/default.conf"
+    depends_on:
+      - users
+      - products
+      - recommendations
+      - advertisements
+      - carts
+      - orders
+      - user-logs
+
+volumes:
+  polyglot-mongo: {}
+  redis: {}
+  neo4j: {}
+  polyglot-mysql: {}
+  cassandra: {}
