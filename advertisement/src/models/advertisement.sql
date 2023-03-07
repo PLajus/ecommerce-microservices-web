@@ -1,1 +1,0 @@
-create table ecommerce_microservice.advertisement (id uuid PRIMARY KEY, name text, description text, created timestamp, expires timestamp, shownCount int);

@@ -3,7 +3,7 @@ import { driver } from "../services/neo4j";
 import { validateNodeInput } from "../services/nodeInputValidator";
 
 class RecommendationsController {
-  async getAllNodes(req: Request, res: Response) {
+  async getAllNodes(_req: Request, res: Response) {
     const session = driver.session();
 
     const result = await session.run(`MATCH (n) RETURN n`);
@@ -16,7 +16,7 @@ class RecommendationsController {
   async getUserRelationships(req: Request, res: Response) {
     const user = req.body.user;
     if (!user) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
@@ -35,7 +35,7 @@ class RecommendationsController {
     const { nodeType, propertyName, propertyValue } = req.body;
 
     if (!validateNodeInput(nodeType, propertyName, propertyValue)) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
@@ -55,7 +55,7 @@ class RecommendationsController {
     const { user, product, relationship } = req.body;
 
     if (!user || !product || !relationship) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
@@ -77,7 +77,7 @@ class RecommendationsController {
   async updateProduct(req: Request, res: Response) {
     const { product, newProduct } = req.body;
     if (!product || !newProduct) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
@@ -97,7 +97,7 @@ class RecommendationsController {
     const { user, relationship, product } = req.body;
 
     if (!user || !relationship || !product) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
@@ -117,7 +117,7 @@ class RecommendationsController {
     const { nodeType, propertyName, propertyValue } = req.body;
 
     if (!validateNodeInput(nodeType, propertyName, propertyValue)) {
-      return res.status(400).json("Invalid Inputs");
+      return res.status(400).json("Invalid inputs");
     }
 
     const session = driver.session();
