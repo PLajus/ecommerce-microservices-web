@@ -11,6 +11,7 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 export const validateProductOperation = [
   param("id").exists().trim(),
   body("productId").exists(),
+  body("amount").optional().isNumeric(),
   validate,
 ];
 

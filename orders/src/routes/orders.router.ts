@@ -4,7 +4,7 @@ import OrdersController from "../controllers/orders.controller";
 import {
   validateFindById,
   validateNewOrder,
-  validateUpdateOrderStatus,
+  validateUpdateOrder,
 } from "../services/orderValidator";
 
 export const router = express.Router();
@@ -19,4 +19,6 @@ router.get("/:id", validateFindById, orders.getOrder);
 
 router.post("/", validateNewOrder, orders.createOrder);
 
-router.put("/status/update", validateUpdateOrderStatus, orders.updateStatus);
+router.put("/:id", validateUpdateOrder, orders.updateOrder);
+
+router.delete("/:id", validateFindById, orders.deleteOrder);

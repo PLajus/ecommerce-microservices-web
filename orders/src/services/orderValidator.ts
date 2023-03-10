@@ -13,10 +13,10 @@ export const validateNewOrder = [
   body("status")
     .optional()
     .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
-  body("total").exists().isNumeric(),
+  body("total").exists().isString(),
 
-  body("addressId").exists().not().isEmpty(),
-  body("paymentId").exists().not().isEmpty(),
+  body("addressId").exists().not().isEmpty().isNumeric(),
+  body("paymentId").exists().not().isEmpty().isNumeric(),
 
   body("orderItems").exists().isArray(),
   body("orderItems.*.productId").exists().isString(),
@@ -24,11 +24,28 @@ export const validateNewOrder = [
   validate,
 ];
 
-export const validateUpdateOrderStatus = [
+// export const validateUpdateOrderStatus = [
+//   param("id").exists(),
+//   body("newStatus")
+//     .exists()
+//     .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
+//   validate,
+// ];
+
+export const validateUpdateOrder = [
   param("id").exists(),
-  body("newStatus")
-    .exists()
-    .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
+  oneOf([
+    body("status")
+      .exists()
+      .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
+
+    body("addressId").exists().not().isEmpty().isNumeric(),
+    body("paymentId").exists().not().isEmpty().isNumeric(),
+  ]),
+  body("customerEmail").not().exists(),
+  body("total").not().exists(),
+  body("orderItems").not().exists(),
+
   validate,
 ];
 
