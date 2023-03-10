@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { CallbackError } from "mongoose";
+
 import User from "../models/user";
 
 export default class UsersController {
@@ -53,6 +54,13 @@ export default class UsersController {
       token: req.query.secret_token,
     });
   }
+
+  async updateStatus(req: Request, res: Response) {
+    const result = await User.findByIdAndUpdate(req.params.id, req.body);
+
+    res.json(result);
+  }
+
   changePassword(req: Request, res: Response) {
     User.findOne({ _id: req.user?._id }, (err: any, user: any) => {
       if (err) {
@@ -86,6 +94,7 @@ export default class UsersController {
       }
     });
   }
+
   delete(req: Request, res: Response) {
     const id = req.params.id;
 

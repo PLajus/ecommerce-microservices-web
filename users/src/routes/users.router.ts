@@ -1,7 +1,12 @@
 import express from "express";
 import passport from "passport";
+
 import UsersController from "../controllers/users.controller";
-import { validateNewUser, validateDelUser } from "../services/validator";
+import {
+  validateNewUser,
+  validateDelUser,
+  validateUpdateSatus,
+} from "../services/validator";
 
 export const router = express.Router();
 
@@ -24,5 +29,7 @@ router.post("/logout", users.logOut);
 router.get("/profile", users.isLoggedIn, users.profile);
 
 router.post("/changePass", users.isLoggedIn, users.changePassword);
+
+router.put("/:id", validateUpdateSatus, users.updateStatus);
 
 router.delete("/", validateDelUser, users.delete);

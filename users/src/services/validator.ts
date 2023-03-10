@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { check, validationResult, param } from "express-validator";
+import { validationResult, param, body } from "express-validator";
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -9,8 +9,14 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const validateNewUser = [
-  check("email").exists().trim().isEmail(),
-  check("password").exists().trim().isStrongPassword(),
+  body("email").exists().trim().isEmail(),
+  body("password").exists().trim().isStrongPassword(),
+  validate,
+];
+
+export const validateUpdateSatus = [
+  param("id").exists().not().isEmpty(),
+  body("status").exists().isIn(["New", "Active", "Closed", "Banned"]),
   validate,
 ];
 
