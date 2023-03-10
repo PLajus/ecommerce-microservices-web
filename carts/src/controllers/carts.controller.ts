@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Request, Response } from "express";
+
 import { redis } from "../services/redis";
 import { isEmpty } from "../utils/emptyObjectChecker";
 

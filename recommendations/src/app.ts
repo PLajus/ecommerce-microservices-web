@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+
 import { router as recommendations } from "./routes/recommendations.router";
 
 class App {

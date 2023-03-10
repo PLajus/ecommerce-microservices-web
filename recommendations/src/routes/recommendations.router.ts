@@ -1,4 +1,5 @@
 import express from "express";
+
 import RecommendationsController from "../controllers/recommendations.controller";
 
 export const router = express.Router();

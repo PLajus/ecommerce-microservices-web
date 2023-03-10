@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import { Order } from "../models/order";
 import { OrderItems } from "../models/order.items";
 import { Address as ShippingAddress } from "../models/address";
@@ -51,8 +52,8 @@ class OrdersController {
     res.json(`Order ${orderId} created successfully!`);
   }
 
-  async updateStatus(req: Request, res: Response) {
-    Order.update(req.body.newStatus, { where: { id: req.params.id } })
+  async updateOrder(req: Request, res: Response) {
+    Order.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
       .catch((err) => res.status(400).json(err));
   }

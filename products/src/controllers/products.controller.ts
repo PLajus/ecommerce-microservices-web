@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import Product from "../models/product";
 
 class ProductController {
