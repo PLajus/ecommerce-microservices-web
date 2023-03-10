@@ -9,20 +9,18 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const validateNewPayment = [
-  body("payment").exists(),
-  body("payment.provider").not().isEmpty().isString(),
-  body("payment.status").optional().isIn(["Pending", "Paid", "Canceled"]),
-  body("payment.addressId").exists(),
+  body("provider").not().isEmpty().isString(),
+  body("status").optional().isIn(["Pending", "Paid", "Canceled"]),
+  body("addressId").exists(),
   validate,
 ];
 
 export const validateUpdatePayment = [
   param("id").exists(),
-  body("payment").exists(),
   oneOf([
-    body("payment.provider").exists().isString(),
-    body("payment.status").exists().isIn(["Pending", "Paid", "Canceled"]),
-    body("payment.addressId").exists().not().isEmpty(),
+    body("provider").exists().isString(),
+    body("status").exists().isIn(["Pending", "Paid", "Canceled"]),
+    body("addressId").exists().not().isEmpty(),
   ]),
   validate,
 ];

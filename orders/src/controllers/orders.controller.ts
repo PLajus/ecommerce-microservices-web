@@ -30,19 +30,15 @@ class OrdersController {
   }
 
   async createOrder(req: Request, res: Response) {
-    const order = await Order.create(req.body.order).catch((err) =>
+    const order: any = await Order.create(req.body).catch((err) =>
       res.status(500).json({
         status: "fail",
         message: err.message || "An error occurred while creating the order.",
       })
     );
+    const orderId = order.id;
 
-    let orderId: any = -1;
-    if ("id" in order) {
-      orderId = order.id;
-    }
-
-    const orderItems = req.body.order;
+    const orderItems = req.body;
 
     for (const i in orderItems) {
       const item = Object.keys(orderItems[i]);
@@ -58,6 +54,12 @@ class OrdersController {
   async updateStatus(req: Request, res: Response) {
     Order.update(req.body.newStatus, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
+      .catch((err) => res.status(400).json(err));
+  }
+
+  async deleteOrder(req: Request, res: Response) {
+    Order.destroy({ where: { id: req.params.id } })
+      .then((num) => res.json(`${num} records deleted!`))
       .catch((err) => res.status(400).json(err));
   }
 }

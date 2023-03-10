@@ -2,11 +2,11 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../services/database";
 
 export const OrderItems = sequelize.define("order_items", {
-  itemId: {
+  productId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  itemAmount: {
+  amount: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
     allowNull: false,

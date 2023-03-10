@@ -21,7 +21,7 @@ class AdressesController {
   }
 
   async createAddress(req: Request, res: Response) {
-    Address.create(req.body.address)
+    Address.create(req.body)
       .then((data) => res.json(data))
       .catch((err) =>
         res.status(400).json({
@@ -33,7 +33,7 @@ class AdressesController {
   }
 
   async updateAddress(req: Request, res: Response) {
-    Address.update(req.body.address, { where: { id: req.params.id } })
+    Address.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
       .catch((err) => res.status(400).json(err));
   }

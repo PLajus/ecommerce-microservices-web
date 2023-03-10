@@ -21,7 +21,7 @@ class PaymentsController {
   }
 
   async createPayment(req: Request, res: Response) {
-    Payment.create(req.body.payment)
+    Payment.create(req.body)
       .then((data) => res.json(data))
       .catch((err) =>
         res.status(400).json({
@@ -33,7 +33,7 @@ class PaymentsController {
   }
 
   async updatePayment(req: Request, res: Response) {
-    Payment.update(req.body.payment, { where: { id: req.params.id } })
+    Payment.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
       .catch((err) => res.status(400).json(err));
   }

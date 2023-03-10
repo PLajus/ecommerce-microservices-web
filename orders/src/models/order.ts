@@ -15,14 +15,20 @@ export const Order = sequelize.define("orders", {
     allowNull: false,
   },
   total: {
-    type: DataTypes.DOUBLE,
-    defaultValue: 0.0,
+    type: DataTypes.STRING,
+    defaultValue: "€1.0",
   },
 });
 
-Order.belongsTo(ShippingAddress);
-Order.belongsTo(Payment);
-Order.hasMany(OrderItems);
+Order.belongsTo(ShippingAddress, {
+  onDelete: "CASCADE",
+});
+Order.belongsTo(Payment, {
+  onDelete: "CASCADE",
+});
+Order.hasMany(OrderItems, {
+  onDelete: "CASCADE",
+});
 
 sequelize
   .sync()

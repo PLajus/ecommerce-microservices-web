@@ -18,7 +18,7 @@ export const Address = sequelize.define("addresses", {
   state: {
     type: DataTypes.STRING,
   },
-  postalCode: {
+  postcode: {
     type: DataTypes.STRING,
     allowNull: false,
   },
