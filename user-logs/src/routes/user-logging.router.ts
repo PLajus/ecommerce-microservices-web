@@ -1,6 +1,12 @@
 import express from "express";
+
 import UserLoggingController from "../controllers/user-logs.controller";
-import { validateNewLog, validateDelLog } from "../services/validator";
+import {
+  validateNewLog,
+  validateFindById,
+  validateGetUserLog,
+  validateUpdateLog,
+} from "../services/validator";
 
 export const router = express.Router();
 
@@ -10,8 +16,12 @@ router.use(express.json());
 
 router.get("/", logger.getAll);
 
-router.get("/:user", logger.getUsersLogs);
+router.get("/:id", validateFindById, logger.getLog);
+
+router.get("/:user", validateGetUserLog, logger.getUsersLogs);
 
 router.post("/", validateNewLog, logger.createLog);
 
-router.delete("/:id", validateDelLog, logger.daleteLog);
+router.put("/:id", validateUpdateLog, logger.updateLogRequest);
+
+router.delete("/:id", validateFindById, logger.daleteLog);

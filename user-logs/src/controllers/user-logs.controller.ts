@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+
 import { client } from "../services/cassandra.client";
 
 class UserLogsController {
@@ -10,6 +11,26 @@ class UserLogsController {
     client.execute(query).then((result) => {
       res.json(result.rows);
     });
+  }
+
+  async getLog(req: Request, res: Response) {
+    const query = "SELECT * FROM logs WHERE id = ?";
+
+    client.execute(
+      query,
+      [req.params.id],
+      { prepare: true },
+      (err: any, result: any) => {
+        if (err) {
+          console.log(err);
+          res
+            .status(400)
+            .json(`There was an error getting log ${req.params.id} logs`);
+        } else {
+          res.json(result.rows);
+        }
+      }
+    );
   }
 
   async getUsersLogs(req: Request, res: Response) {
@@ -24,7 +45,7 @@ class UserLogsController {
           console.log(err);
           res
             .status(400)
-            .json(`There was an error getting users ${req.body.user} logs`);
+            .json(`There was an error getting users ${req.params.user} logs`);
         } else {
           res.json(result.rows);
         }
@@ -51,6 +72,23 @@ class UserLogsController {
         res.status(400).json(`Could not create log!`);
       } else {
         res.json("Log created!");
+      }
+    });
+  }
+
+  async updateLogRequest(req: Request, res: Response) {
+    const query = `UPDATE logs SET
+      request = ?
+      WHERE id = ?`;
+
+    const params = [req.body.request, req.params.id];
+
+    client.execute(query, params, { prepare: true }, (err) => {
+      if (err) {
+        console.error(err);
+        res.status(400).json(`Could not update log!`);
+      } else {
+        res.json("Log request updated!");
       }
     });
   }
