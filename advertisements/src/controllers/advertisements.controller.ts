@@ -37,8 +37,9 @@ class AdvertisementsController {
       req.body.description,
       date.toISOString,
       date.toISOString,
-      new Date(date.setMonth(date.getMonth() + 1)).toISOString,
-      // req.body.expires,
+      req.body.expires
+        ? req.body.expires
+        : new Date(date.setMonth(date.getMonth() + 1)).toISOString,
       0,
     ];
 
