@@ -1,32 +1,36 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../services/database";
 
-export const Address = sequelize.define("addresses", {
-  type: {
-    type: DataTypes.ENUM("Shipping", "Billing"),
-    defaultValue: "Shipping",
-    allowNull: false,
+export const Address = sequelize.define(
+  "addresses",
+  {
+    type: {
+      type: DataTypes.ENUM("Shipping", "Billing"),
+      defaultValue: "Shipping",
+      allowNull: false,
+    },
+    street: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    state: {
+      type: DataTypes.STRING,
+    },
+    postcode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
-  street: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  city: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  state: {
-    type: DataTypes.STRING,
-  },
-  postcode: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  country: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
+  { timestamps: true }
+);
 
 sequelize
   .sync()

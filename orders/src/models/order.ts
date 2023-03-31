@@ -1,24 +1,29 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../services/database";
-import { OrderItems } from "./order.items";
+
+import { OrderItems } from "./order-items";
 import { Address as ShippingAddress } from "./address";
 import { Payment } from "./payment";
 
-export const Order = sequelize.define("orders", {
-  customerEmail: {
-    type: DataTypes.STRING,
-    allowNull: false,
+export const Order = sequelize.define(
+  "orders",
+  {
+    customerEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("New", "Pending", "Hold", "Shipped", "Delivered"),
+      defaultValue: "New",
+      allowNull: false,
+    },
+    total: {
+      type: DataTypes.STRING,
+      defaultValue: "€1.0",
+    },
   },
-  status: {
-    type: DataTypes.ENUM("New", "Pending", "Hold", "Shipped", "Delivered"),
-    defaultValue: "New",
-    allowNull: false,
-  },
-  total: {
-    type: DataTypes.STRING,
-    defaultValue: "€1.0",
-  },
-});
+  { timestamps: true }
+);
 
 Order.belongsTo(ShippingAddress, {
   onDelete: "CASCADE",

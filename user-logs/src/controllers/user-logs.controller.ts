@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
@@ -61,7 +60,7 @@ class UserLogsController {
     const params = [
       uuidv4(),
       req.body.user,
-      new Date(),
+      new Date().toISOString(),
       req.body.request,
       req.body.params,
     ];

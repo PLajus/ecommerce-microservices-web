@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { Request, Response } from "express";
 
 import { redis } from "../services/redis";
@@ -15,23 +14,37 @@ class CartsController {
     }
   }
 
-  async getAmountofProduct(req: Request, res: Response) {
-    const product = await redis.hget(req.params.id, req.body.productId);
+  // async getAmountofProduct(req: Request, res: Response) {
+  //   const product = await redis.hget(req.params.id, req.body.productId);
 
-    if (!isEmpty(product)) {
-      res.status(200).json(product);
+  //   if (!isEmpty(product)) {
+  //     res.status(200).json(product);
+  //   } else {
+  //     res
+  //       .status(404)
+  //       .json(
+  //         `Unable to find product ${req.body.productId} in users ${req.params.id} cart`
+  //       );
+  //   }
+  // }
+
+  async createCart(req: Request, res: Response) {
+    const cart = await redis.hset(
+      req.params.id,
+      "items",
+      JSON.stringify(req.body.items),
+      "total",
+      JSON.stringify(req.body.total)
+    );
+
+    if (cart >= 0) {
+      res.status(200).json(`Created users ${req.params.id} cart`);
     } else {
-      res
-        .status(404)
-        .json(
-          `Unable to find product ${req.body.productId} in users ${req.params.id} cart`
-        );
+      res.status(500).json(`Unable to create users ${req.params.id} carts`);
     }
   }
 
-  async updateOrCreateCart(req: Request, res: Response) {
-    //TODO: add user auth check
-
+  async updateCart(req: Request, res: Response) {
     const updatedCart = await redis.hset(req.params.id, req.body);
 
     if (updatedCart >= 0) {
@@ -41,43 +54,39 @@ class CartsController {
     }
   }
 
-  async removeOneProduct(req: Request, res: Response) {
-    //TODO: add user auth check
+  // async removeOneProduct(req: Request, res: Response) {
+  //   const productAmount = await redis.hget(req.params.id, req.body.productId);
 
-    const productAmount = await redis.hget(req.params.id, req.body.productId);
+  //   if (productAmount) {
+  //     let numProductAmount = parseInt(productAmount);
 
-    if (productAmount) {
-      let numProductAmount = parseInt(productAmount);
-
-      if (numProductAmount > 1) {
-        await redis.hset(
-          req.params.id,
-          {
-            [req.body.productId]: --numProductAmount,
-          },
-          (err, result) => {
-            if (err) {
-              res.status(400).json(`There was an error: ${err}`);
-            } else {
-              res.json(`${result} products updated`);
-            }
-          }
-        );
-      } else {
-        await redis.hdel(req.params.id, req.body.productId, (err, result) => {
-          if (err) {
-            res.status(400).json(`There was an error: ${err}`);
-          } else {
-            res.json(`${result} products updated`);
-          }
-        });
-      }
-    }
-  }
+  //     if (numProductAmount > 1) {
+  //       await redis.hset(
+  //         req.params.id,
+  //         {
+  //           [req.body.productId]: --numProductAmount,
+  //         },
+  //         (err, result) => {
+  //           if (err) {
+  //             res.status(400).json(`There was an error: ${err}`);
+  //           } else {
+  //             res.json(`${result} products updated`);
+  //           }
+  //         }
+  //       );
+  //     } else {
+  //       await redis.hdel(req.params.id, req.body.productId, (err, result) => {
+  //         if (err) {
+  //           res.status(400).json(`There was an error: ${err}`);
+  //         } else {
+  //           res.json(`${result} products updated`);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   async deleteCart(req: Request, res: Response) {
-    //TODO: add user auth check
-
     const deletedCart = await redis.del(req.params.id);
 
     if (deletedCart) {

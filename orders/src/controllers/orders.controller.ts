@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { Order } from "../models/order";
-import { OrderItems } from "../models/order.items";
+import { OrderItems } from "../models/order-items";
 import { Address as ShippingAddress } from "../models/address";
 import { Payment } from "../models/payment";
 
@@ -17,10 +17,10 @@ class OrdersController {
       include: [OrderItems, ShippingAddress, Payment],
     }).catch((err) =>
       res.status(500).json({
-        status: "fail",
-        message: err.message || "An error occurred while creating the order.",
+        message: err.message || "There was an error!",
       })
     );
+
     if (order) {
       res.json(order);
     } else {
@@ -31,37 +31,36 @@ class OrdersController {
   }
 
   async createOrder(req: Request, res: Response) {
-    const order: any = await Order.create(req.body).catch((err) =>
+    const order: any = await Order.create(req.body.orderInfo).catch((err) =>
       res.status(500).json({
-        status: "fail",
-        message: err.message || "An error occurred while creating the order.",
+        message: err.message || "There was an error!",
       })
     );
-    const orderId = order.id;
-
-    const orderItems = req.body;
+    const orderItems = req.body.orderItems;
 
     for (const i in orderItems) {
-      const item = Object.keys(orderItems[i]);
+      const item = orderItems[i];
+      const keys = Object.keys(orderItems[i]);
+
       await OrderItems.create({
-        itemId: item[0],
-        itemAmount: orderItems[i][item[0]],
-        orderId: orderId,
+        productId: item[keys[0]],
+        amount: item[keys[1]],
+        orderId: order.id,
       });
     }
-    res.json(`Order ${orderId} created successfully!`);
+    res.json(order);
   }
 
   async updateOrder(req: Request, res: Response) {
     Order.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 
   async deleteOrder(req: Request, res: Response) {
     Order.destroy({ where: { id: req.params.id } })
       .then((num) => res.json(`${num} records deleted!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 }
 

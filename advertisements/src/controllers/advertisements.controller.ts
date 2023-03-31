@@ -1,11 +1,11 @@
-import "dotenv/config";
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+
 import { client } from "../services/cassandra.client";
 
 class AdvertisementsController {
-  async getAllAds(_req: Request, res: Response) {
-    const query = "SELECT * FROM advertisement";
+  async getAll(_req: Request, res: Response) {
+    const query = "SELECT * FROM advertisements";
 
     client.execute(query).then((result) => {
       res.json(result.rows);
@@ -13,7 +13,7 @@ class AdvertisementsController {
   }
 
   async getAd(req: Request, res: Response) {
-    const query = "SELECT * FROM advertisement WHERE id = ?";
+    const query = "SELECT * FROM advertisements WHERE id = ?";
 
     client.execute(query, [req.params.id], (err, result) => {
       if (err) {
@@ -25,7 +25,7 @@ class AdvertisementsController {
   }
 
   async createAd(req: Request, res: Response) {
-    const query = `INSERT INTO advertisement 
+    const query = `INSERT INTO advertisements 
       (id, name, description, createdAt, updatedAt, expiresAt, showncount) 
       VALUES (?,?,?,?,?,?,?)`;
 
@@ -35,11 +35,11 @@ class AdvertisementsController {
       uuidv4(),
       req.body.name,
       req.body.description,
-      date.toISOString,
-      date.toISOString,
+      date.toISOString(),
+      date.toISOString(),
       req.body.expires
         ? req.body.expires
-        : new Date(date.setMonth(date.getMonth() + 1)).toISOString,
+        : new Date(date.setMonth(date.getMonth() + 1)).toISOString(),
       0,
     ];
 
@@ -48,13 +48,13 @@ class AdvertisementsController {
         console.error(err);
         res.status(400).json(`Could not create ad!`);
       } else {
-        res.json("Advertisement created!");
+        res.json(`Advertisement created ${result.rows}!`);
       }
     });
   }
 
   async updateAdDesc(req: Request, res: Response) {
-    const query = `UPDATE advertisement SET
+    const query = `UPDATE advertisements SET
       description = ?
       WHERE id = ?`;
 
@@ -70,7 +70,7 @@ class AdvertisementsController {
   }
 
   async updateAdName(req: Request, res: Response) {
-    const query = `UPDATE advertisement SET
+    const query = `UPDATE advertisements SET
       name = ?
       WHERE id = ?`;
     const params = [req.body.name, req.params.id];
@@ -86,7 +86,7 @@ class AdvertisementsController {
   }
 
   async updateAdShowCount(req: Request, res: Response) {
-    const query = `UPDATE advertisement SET
+    const query = `UPDATE advertisements SET
       showncount = ?
       WHERE id = ?`;
 
@@ -103,7 +103,7 @@ class AdvertisementsController {
   }
 
   async updateAdExpiration(req: Request, res: Response) {
-    const query = `UPDATE advertisement SET
+    const query = `UPDATE advertisements SET
       expires = ?
       WHERE id = ?`;
 
@@ -119,8 +119,8 @@ class AdvertisementsController {
     });
   }
 
-  async daleteAd(req: Request, res: Response) {
-    const query = `DELETE FROM advertisement
+  async deleteAd(req: Request, res: Response) {
+    const query = `DELETE FROM advertisements
       WHERE id = ? IF EXISTS`;
 
     client.execute(query, [req.params.id], { prepare: true }, (err) => {

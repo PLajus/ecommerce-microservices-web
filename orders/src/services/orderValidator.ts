@@ -9,28 +9,21 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const validateNewOrder = [
-  body("customerEmail").exists().isEmail(),
-  body("status")
+  body("orderInfo").exists().isObject(),
+  body("orderInfo.customerEmail").exists().isEmail(),
+  body("orderInfo.status")
     .optional()
     .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
-  body("total").exists().isString(),
+  body("orderInfo.total").exists().isString(),
 
-  body("addressId").exists().not().isEmpty().isNumeric(),
-  body("paymentId").exists().not().isEmpty().isNumeric(),
+  body("orderInfo.addressId").exists().not().isEmpty().isNumeric(),
+  body("orderInfo.paymentId").exists().not().isEmpty().isNumeric(),
 
   body("orderItems").exists().isArray(),
   body("orderItems.*.productId").exists().isString(),
   body("orderItems.*.amount").exists().isNumeric(),
   validate,
 ];
-
-// export const validateUpdateOrderStatus = [
-//   param("id").exists(),
-//   body("newStatus")
-//     .exists()
-//     .isIn(["New", "Pending", "Hold", "Shipped", "Delivered"]),
-//   validate,
-// ];
 
 export const validateUpdateOrder = [
   param("id").exists(),

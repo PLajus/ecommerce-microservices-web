@@ -8,16 +8,18 @@ const recommendations = new RecommendationsController();
 
 router.use(express.json());
 
-router.get("/all", recommendations.getAllNodes);
+router.get("/", recommendations.getAllNodes);
 
-router.get("/userRecs", recommendations.getUserRelationships);
+router.get("/:email", recommendations.getUserRelationships);
 
-router.post("/newNode", recommendations.createNode);
+router.post("/node", recommendations.createNode);
 
-router.post("/newRelationship", recommendations.createRelationship);
+router.post("/relationship", recommendations.createRelationship);
 
-router.put("/updateProduct", recommendations.updateProduct);
+router.put("/product/:product", recommendations.updateProduct);
 
-router.delete("/delRelationship", recommendations.delRelationship);
+router.delete("/relationship", recommendations.delRelationship);
 
-router.delete("/delNode", recommendations.delNode);
+router.delete("/node", recommendations.delNode);
+
+router.delete("/node/:product", recommendations.delProductNode);

@@ -14,7 +14,9 @@ const users: UsersController = new UsersController();
 
 router.use(express.json());
 
-router.get("/all", users.getAllUsers);
+router.get("/", users.getAllUsers);
+
+router.get("/:id", users.getUser);
 
 router.post("/signup", validateNewUser, users.signUp);
 
@@ -32,4 +34,4 @@ router.post("/changePass", users.isLoggedIn, users.changePassword);
 
 router.put("/:id", validateUpdateSatus, users.updateStatus);
 
-router.delete("/", validateDelUser, users.delete);
+router.delete("/:id", validateDelUser, users.delete);

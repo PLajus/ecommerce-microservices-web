@@ -11,7 +11,7 @@ const validator = new Validator();
 
 router.use(express.json());
 
-router.get("/", advertisement.getAllAds);
+router.get("/", advertisement.getAll);
 
 router.get("/:id", validator.validateIdExists, advertisement.getAd);
 
@@ -37,4 +37,4 @@ router.put(
   advertisement.updateAdExpiration
 );
 
-router.delete("/:id", validator.validateIdExists, advertisement.daleteAd);
+router.delete("/:id", validator.validateIdExists, advertisement.deleteAd);

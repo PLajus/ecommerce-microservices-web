@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CallbackError } from "mongoose";
+import mongoose from "mongoose";
 
 import User from "../models/user";
 
@@ -7,6 +7,20 @@ export default class UsersController {
   async getAllUsers(_req: Request, res: Response) {
     const users = await User.find({});
     return res.json(users);
+  }
+
+  async getUser(req: Request, res: Response) {
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      const user = await User.findById(req.params.id);
+
+      if (!user) {
+        return res
+          .status(400)
+          .json(`User with id: ${req.params.id} not found!`);
+      }
+      return res.json(user);
+    }
+    return res.status(400).json("Invalid ID");
   }
 
   signUp(req: Request, res: Response) {
@@ -26,8 +40,12 @@ export default class UsersController {
     );
   }
 
-  logIn(_req: Request, res: Response) {
-    res.json({ success: true, message: "You have logged in!" });
+  logIn(req: Request, res: Response) {
+    if (req.isAuthenticated()) {
+      res.json("You are already logged in.");
+    } else {
+      res.json({ success: true, message: "You have logged in!" });
+    }
   }
 
   logOut(req: Request, res: Response, next: NextFunction) {
@@ -56,9 +74,12 @@ export default class UsersController {
   }
 
   async updateStatus(req: Request, res: Response) {
-    const result = await User.findByIdAndUpdate(req.params.id, req.body);
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      const result = await User.findByIdAndUpdate(req.params.id, req.body);
 
-    res.json(result);
+      return res.json(result);
+    }
+    return res.status(400).json("Invalid ID");
   }
 
   changePassword(req: Request, res: Response) {
@@ -96,14 +117,19 @@ export default class UsersController {
   }
 
   delete(req: Request, res: Response) {
-    const id = req.params.id;
-
-    User.findByIdAndDelete(id, (err: CallbackError, result: any) => {
-      if (err) {
-        res.status(400).json("Couldn't delete user");
-      } else {
-        res.json(result);
-      }
-    });
+    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+      User.findByIdAndDelete(
+        req.params.id,
+        (err: mongoose.CallbackError, result: any) => {
+          if (err) {
+            res.status(400).json("Couldn't delete user");
+          } else {
+            res.json(result);
+          }
+        }
+      );
+    } else {
+      return res.status(400).json("Invalid ID");
+    }
   }
 }

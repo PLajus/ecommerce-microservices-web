@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { driver } from "../services/neo4j";
+
 import { validateNodeInput } from "../services/nodeInputValidator";
 
 class RecommendationsController {
@@ -8,13 +9,26 @@ class RecommendationsController {
 
     const result = await session.run(`MATCH (n) RETURN n`);
 
+    let users = [],
+      products = [];
+
+    for (const i in result.records) {
+      const record = result.records[i];
+      const node = record.get(0);
+      if (node.properties.email) {
+        users.push(node.properties.email);
+      } else {
+        products.push(node.properties.name);
+      }
+    }
+
     session.close();
 
-    return res.json({ result: result.records.length });
+    return res.json({ users: users, products: products });
   }
 
   async getUserRelationships(req: Request, res: Response) {
-    const user = req.body.user;
+    const user = req.params.email;
     if (!user) {
       return res.status(400).json("Invalid inputs");
     }
@@ -48,7 +62,10 @@ class RecommendationsController {
     );
     session.close();
 
-    return res.json({ result: result.summary.updateStatistics });
+    return res.json({
+      result: result.summary.updateStatistics,
+      created: propertyValue,
+    });
   }
 
   async createRelationship(req: Request, res: Response) {
@@ -75,8 +92,8 @@ class RecommendationsController {
   }
 
   async updateProduct(req: Request, res: Response) {
-    const { product, newProduct } = req.body;
-    if (!product || !newProduct) {
+    const { newProduct } = req.body;
+    if (!newProduct) {
       return res.status(400).json("Invalid inputs");
     }
 
@@ -85,7 +102,7 @@ class RecommendationsController {
     const result = await session.run(
       `MATCH (p:Product {name: $name})
       SET p.name = $newName`,
-      { name: product, newName: newProduct }
+      { name: req.params.product, newName: newProduct }
     );
 
     session.close();
@@ -126,6 +143,20 @@ class RecommendationsController {
       `MATCH (n:${nodeType} {${propertyName}: $value})
       DELETE n`,
       { value: propertyValue }
+    );
+
+    session.close();
+
+    return res.json({ result: result.summary.updateStatistics });
+  }
+
+  async delProductNode(req: Request, res: Response) {
+    const session = driver.session();
+
+    const result = await session.run(
+      `MATCH (p:$Product {name: $name})
+      DELETE n`,
+      { name: req.params.product }
     );
 
     session.close();

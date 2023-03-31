@@ -7,7 +7,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo/ecommerce
+      - MONGO_URI_LOCAL=mongodb://mongo/ecommerce
 
   products:
     build: ./products
@@ -16,7 +16,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo/ecommerce
+      - MONGO_URI_LOCAL=mongodb://mongo/ecommerce
 
   recommendations:
     build: ./recommendations
@@ -57,7 +57,7 @@ services:
     depends_on:
       - mysql
     environment:
-      - DB_TABLE=orders
+      - DB=orders
       - DB_USER=root
       - DB_PASS=password
       - DB_HOST=mysql
@@ -79,7 +79,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - "polyglot-mongo:/data/db"
+      - "mongo:/data/db"
 
   mongo-express:
     image: mongo-express
@@ -117,7 +117,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
     volumes:
-      - "polyglot-mysql:/var/lib/mysql"
+      - "mysql:/var/lib/mysql"
 
   cassandra:
     image: bitnami/cassandra
@@ -130,9 +130,9 @@ services:
   nginx:
     image: nginx
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
-      - "./default.conf:/etc/nginx/conf.d/default.conf"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
     depends_on:
       - users
       - products
@@ -143,8 +143,8 @@ services:
       - user-logs
 
 volumes:
-  polyglot-mongo: {}
+  mongo: {}
   redis: {}
   neo4j: {}
-  polyglot-mysql: {}
+  mysql: {}
   cassandra: {}

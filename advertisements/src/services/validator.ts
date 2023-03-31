@@ -14,7 +14,8 @@ export default class Validator {
   validateCreateAd = [
     body("name").exists().trim(),
     body("description").exists().trim(),
-    body("expires").optional().isString(),
+    body("expires").exists().isISO8601().toDate(),
+    body("shownCount").optional().isNumeric(),
     this.validate,
   ];
 

@@ -18,7 +18,7 @@ class App {
 
   public connectToDB(): void {
     mongoose.set("strictQuery", false);
-    mongoose.connect(process.env.MONGO_URI!, () => {
+    mongoose.connect(process.env.MONGO_URI_LOCAL!, () => {
       console.log("Connected to MongoDB");
     });
   }

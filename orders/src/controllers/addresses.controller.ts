@@ -11,7 +11,12 @@ class AdressesController {
   async getAddress(req: Request, res: Response) {
     const address = await Address.findOne({
       where: { id: req.params.id },
-    });
+    }).catch((err) =>
+      res.status(500).json({
+        message: err.message || "There was an error!",
+      })
+    );
+
     if (address) {
       res.json(address);
     } else {
@@ -25,10 +30,8 @@ class AdressesController {
     Address.create(req.body)
       .then((data) => res.json(data))
       .catch((err) =>
-        res.status(400).json({
-          status: "fail",
-          message:
-            err.message || "An error occurred while creating the adress.",
+        res.status(500).json({
+          message: err.message || "There was an error!",
         })
       );
   }
@@ -36,13 +39,13 @@ class AdressesController {
   async updateAddress(req: Request, res: Response) {
     Address.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 
   async deleteAddress(req: Request, res: Response) {
     Address.destroy({ where: { id: req.params.id } })
       .then((num) => res.json(`${num} records deleted!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 }
 

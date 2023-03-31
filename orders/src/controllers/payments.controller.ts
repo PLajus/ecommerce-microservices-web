@@ -11,7 +11,12 @@ class PaymentsController {
   async getPayment(req: Request, res: Response) {
     const payment = await Payment.findOne({
       where: { id: req.params.id },
-    });
+    }).catch((err) =>
+      res.status(500).json({
+        message: err.message || "There was an error!",
+      })
+    );
+
     if (payment) {
       res.json(payment);
     } else {
@@ -25,10 +30,8 @@ class PaymentsController {
     Payment.create(req.body)
       .then((data) => res.json(data))
       .catch((err) =>
-        res.status(400).json({
-          status: "fail",
-          message:
-            err.message || "An error occurred while creating the payment.",
+        res.status(500).json({
+          message: err.message || "There was an error!",
         })
       );
   }
@@ -36,13 +39,13 @@ class PaymentsController {
   async updatePayment(req: Request, res: Response) {
     Payment.update(req.body, { where: { id: req.params.id } })
       .then((num) => res.json(`${num} records updated!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 
   async deletePayment(req: Request, res: Response) {
     Payment.destroy({ where: { id: req.params.id } })
       .then((num) => res.json(`${num} records deleted!`))
-      .catch((err) => res.status(400).json(err));
+      .catch((err) => res.status(500).json(err));
   }
 }
 

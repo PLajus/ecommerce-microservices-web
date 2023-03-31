@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { validationResult, param, body, oneOf } from "express-validator";
+import { validationResult, param, body } from "express-validator";
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -8,11 +8,23 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export const validateProductOperation = [
+export const validateCreateCart = [
   param("id").exists().trim(),
-  body("productId").exists(),
-  body("amount").optional().isNumeric(),
+  body("items").exists().isArray(),
+  body("items.*.productId").exists(),
+  body("items.*.amount").exists().isNumeric(),
+  body("total").optional().isString(),
   validate,
 ];
 
+export const validateUpdateCart = [
+  param("id").exists().trim(),
+  body("total").exists().isString(),
+  validate,
+];
+export const validateProductOperation = [
+  param("id").exists().trim(),
+  body("productId").exists(),
+  validate,
+];
 export const validateFindById = [param("id").exists().trim(), validate];
