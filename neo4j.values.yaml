@@ -1,0 +1,19 @@
+neo4j:
+  name: my-standalone
+  resources:
+    cpu: "0.5"
+    memory: "2Gi"
+
+  password: "neo4jpass"
+
+  # Uncomment to use enterprise edition
+  edition: "enterprise"
+  acceptLicenseAgreement: "yes"
+
+volumes:
+  data:
+    mode: "dynamic"
+    dynamic:
+      # * managed-csi-premium provisions premium SSD disks (recommended)
+      # * managed-csi provisions standard SSD-backed disks
+      storageClassName: managed-csi-premium

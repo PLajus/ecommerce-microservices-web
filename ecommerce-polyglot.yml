@@ -1,0 +1,698 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    worker_processes auto;
+
+    events {worker_connections 10000;}
+
+    http {
+        server {
+            listen 80;
+            location /users {
+                proxy_pass http://users:3000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /products {
+                proxy_pass http://products:3001;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /recs {
+                proxy_pass http://recommendations:3002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /ads {
+                proxy_pass http://advertisements:3003;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /carts {
+                proxy_pass http://carts:3004;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /orders {
+                proxy_pass http://orders:3005;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /addresses {
+                proxy_pass http://orders:3005;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /payments {
+                proxy_pass http://orders:3005;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+            location /logs {
+                proxy_pass http://user-logs:3006;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Host $server_name;
+            }
+        }
+    }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mongo
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mongo
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cassandra
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cassandra
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 1
+  maxReplicas: 7
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users
+spec:
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: povjalregistry.azurecr.io/polyglot/users
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 125m
+            limits:
+              memory: 500Mi
+          env:
+            - name: MONGO_URI_LOCAL
+              value: mongodb://mongo/ecommerce
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users
+spec:
+  selector:
+    app: users
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+spec:
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      containers:
+        - name: products
+          image: povjalregistry.azurecr.io/polyglot/products
+          resources:
+            requests:
+              memory: 400Mi
+              cpu: 125m
+            limits:
+              memory: 400Mi
+          env:
+            - name: MONGO_URI_LOCAL
+              value: mongodb://mongo/ecommerce
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: products
+spec:
+  selector:
+    app: products
+  ports:
+    - port: 3001
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendations
+spec:
+  selector:
+    matchLabels:
+      app: recommendations
+  template:
+    metadata:
+      labels:
+        app: recommendations
+    spec:
+      containers:
+        - name: recommendations
+          image: povjalregistry.azurecr.io/polyglot/recommendations
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 125m
+            limits:
+              memory: 500Mi
+          env:
+            - name: DB_CONNECTION
+              value: bolt://neo4j:7687
+            - name: DB_USER
+              value: neo4j
+            - name: DB_PASS
+              value: neo4jpass
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendations
+spec:
+  selector:
+    app: recommendations
+  ports:
+    - port: 3002
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advertisements
+spec:
+  selector:
+    matchLabels:
+      app: advertisements
+  template:
+    metadata:
+      labels:
+        app: advertisements
+    spec:
+      containers:
+        - name: advertisements
+          image: povjalregistry.azurecr.io/polyglot/advertisements
+          resources:
+            requests:
+              memory: 280Mi
+              cpu: 125m
+            limits:
+              memory: 280Mi
+          env:
+            - name: CONTACT_POINT
+              value: cassandra
+            - name: KEYSPACE
+              value: ecommerce
+            - name: LOCALDATACENTER
+              value: datacenter1
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: advertisements
+spec:
+  selector:
+    app: advertisements
+  ports:
+    - port: 3003
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carts
+spec:
+  selector:
+    matchLabels:
+      app: carts
+  template:
+    metadata:
+      labels:
+        app: carts
+    spec:
+      containers:
+        - name: carts
+          image: povjalregistry.azurecr.io/polyglot/carts
+          resources:
+            requests:
+              memory: 280Mi
+              cpu: 125m
+            limits:
+              memory: 280Mi
+          env:
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: carts
+spec:
+  selector:
+    app: carts
+  ports:
+    - port: 3004
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: orders
+          image: povjalregistry.azurecr.io/polyglot/orders
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 125m
+            limits:
+              memory: 500Mi
+          env:
+            - name: DB
+              value: orders
+            - name: DB_USER
+              value: root
+            - name: DB_PASS
+              value: mysqlpass
+            - name: DB_HOST
+              value: mysql
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+spec:
+  selector:
+    app: orders
+  ports:
+    - port: 3005
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-logs
+spec:
+  selector:
+    matchLabels:
+      app: user-logs
+  template:
+    metadata:
+      labels:
+        app: user-logs
+    spec:
+      containers:
+        - name: user-logs
+          image: povjalregistry.azurecr.io/polyglot/user-logs
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 125m
+            limits:
+              memory: 300Mi
+          env:
+            - name: CONTACT_POINT
+              value: cassandra
+            - name: KEYSPACE
+              value: ecommerce
+            - name: LOCALDATACENTER
+              value: datacenter1
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-logs
+spec:
+  selector:
+    app: user-logs
+  ports:
+    - port: 3006
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  serviceName: mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo
+          resources:
+            requests:
+              memory: 250Mi
+              cpu: 125m
+            limits:
+              memory: 250Mi
+          ports:
+            - containerPort: 27017
+              name: database
+          volumeMounts:
+            - name: mongo-polyglot
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-polyglot
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: mysqlpass
+          resources:
+            requests:
+              memory: 450Mi
+              cpu: 125m
+            limits:
+              memory: 450Mi
+          ports:
+            - containerPort: 3306
+              name: database
+          volumeMounts:
+            - name: mysql-polyglot
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-polyglot
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  serviceName: redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis/redis-stack
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 125m
+            limits:
+              memory: 200Mi
+          ports:
+            - containerPort: 6379
+              name: database
+            - containerPort: 8001
+              name: ui
+          volumeMounts:
+            - name: redis-polyglot
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-polyglot
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: tcp
+      port: 6379
+      targetPort: 6379
+    - name: http
+      port: 8001
+      targetPort: 8001
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+spec:
+  selector:
+    matchLabels:
+      app: cassandra
+  serviceName: cassandra
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      containers:
+        - name: cassandra
+          image: bitnami/cassandra
+          securityContext:
+            runAsUser: 1001
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 125m
+            limits:
+              memory: 2Gi
+          ports:
+            - containerPort: 9042
+              name: cql
+          volumeMounts:
+            - name: cassandra-polyglot
+              mountPath: /bitnami
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra-polyglot
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+spec:
+  selector:
+    app: cassandra
+  ports:
+    - port: 9042
+      targetPort: 9042
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          resources:
+            requests:
+              memory: 50Mi
+              cpu: 125m
+            limits:
+              memory: 50Mi
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /etc/nginx
+              name: nginx-conf
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+---
+
