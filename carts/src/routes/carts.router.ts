@@ -4,7 +4,7 @@ import CartsController from "../controllers/carts.controller";
 import {
   validateFindById,
   validateCreateCart,
-  //   validateProductOperation,
+  validateProductOperation,
   validateUpdateCart,
 } from "../services/validator";
 
@@ -14,14 +14,14 @@ const carts = new CartsController();
 
 router.use(express.json());
 
+router.get("/", carts.getAll);
+
 router.get("/:id", validateFindById, carts.getCart);
 
-// router.get("/:id/product", validateProductOperation, carts.getAmountofProduct);
+router.get("/products/:id", validateProductOperation, carts.getAmountofProduct);
 
 router.post("/:id", validateCreateCart, carts.createCart);
 
 router.put("/:id", validateUpdateCart, carts.updateCart);
 
 router.delete("/:id", validateFindById, carts.deleteCart);
-
-// router.delete("/:id/product", validateProductOperation, carts.removeOneProduct);

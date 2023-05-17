@@ -152,10 +152,10 @@ spec:
           image: povjalregistry.azurecr.io/polyglot/users
           resources:
             requests:
-              memory: 500Mi
+              memory: 400Mi
               cpu: 125m
             limits:
-              memory: 500Mi
+              memory: 400Mi
           env:
             - name: MONGO_URI_LOCAL
               value: mongodb://mongo/ecommerce
@@ -230,10 +230,10 @@ spec:
           image: povjalregistry.azurecr.io/polyglot/recommendations
           resources:
             requests:
-              memory: 500Mi
+              memory: 400Mi
               cpu: 125m
             limits:
-              memory: 500Mi
+              memory: 400Mi
           env:
             - name: DB_CONNECTION
               value: bolt://neo4j:7687
@@ -316,10 +316,10 @@ spec:
           image: povjalregistry.azurecr.io/polyglot/carts
           resources:
             requests:
-              memory: 280Mi
+              memory: 400Mi
               cpu: 125m
             limits:
-              memory: 280Mi
+              memory: 400Mi
           env:
             - name: REDIS_HOST
               value: redis
@@ -358,10 +358,10 @@ spec:
           image: povjalregistry.azurecr.io/polyglot/orders
           resources:
             requests:
-              memory: 500Mi
+              memory: 400Mi
               cpu: 125m
             limits:
-              memory: 500Mi
+              memory: 400Mi
           env:
             - name: DB
               value: orders
@@ -477,7 +477,7 @@ spec:
   ports:
     - port: 27017
       targetPort: 27017
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -553,10 +553,10 @@ spec:
           image: redis/redis-stack
           resources:
             requests:
-              memory: 200Mi
+              memory: 180Mi
               cpu: 125m
             limits:
-              memory: 200Mi
+              memory: 180Mi
           ports:
             - containerPort: 6379
               name: database
@@ -609,7 +609,7 @@ spec:
         - name: cassandra
           image: bitnami/cassandra
           securityContext:
-            runAsUser: 1001
+            runAsUser: 0
           resources:
             requests:
               memory: 2Gi

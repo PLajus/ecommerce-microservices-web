@@ -22,9 +22,7 @@ class UserLogsController {
       (err: any, result: any) => {
         if (err) {
           console.log(err);
-          res
-            .status(400)
-            .json(`There was an error getting log ${req.params.id} logs`);
+          res.status(400).json(`There was an error!`);
         } else {
           res.json(result.rows);
         }
@@ -99,9 +97,9 @@ class UserLogsController {
     client.execute(query, [req.params.id], { prepare: true }, (err) => {
       if (err) {
         console.error(err);
-        res.status(400).json(`Could not delete log ${req.params.id}!`);
+        res.status(400).json(`Could not delete log!`);
       } else {
-        res.json(`Log ${req.params.iq} deleted!`);
+        res.json(`Log deleted!`);
       }
     });
   }

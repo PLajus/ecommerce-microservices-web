@@ -34,7 +34,7 @@ class ProductController {
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
       const result = await Product.findByIdAndUpdate(req.params.id, req.body);
 
-      res.json(result);
+      return res.json(result);
     }
     return res.status(400).json("Invalid ID");
   }
@@ -43,7 +43,7 @@ class ProductController {
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
       const result = await Product.findByIdAndDelete(req.params.id);
 
-      res.json(result);
+      return res.json(result);
     }
     return res.status(400).json("Invalid ID");
   }

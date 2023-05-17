@@ -6,6 +6,7 @@ import User from "../models/user";
 export default class UsersController {
   async getAllUsers(_req: Request, res: Response) {
     const users = await User.find({});
+
     return res.json(users);
   }
 
@@ -116,7 +117,7 @@ export default class UsersController {
     });
   }
 
-  delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response) {
     if (mongoose.Types.ObjectId.isValid(req.params.id)) {
       User.findByIdAndDelete(
         req.params.id,

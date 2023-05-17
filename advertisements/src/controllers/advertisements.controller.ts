@@ -17,7 +17,7 @@ class AdvertisementsController {
 
     client.execute(query, [req.params.id], (err, result) => {
       if (err) {
-        res.status(400).json(`There was an error getting ad ${req.params.id}`);
+        res.status(400).json(`There was an error!`);
       } else {
         res.json(result.rows[0]);
       }
@@ -26,7 +26,7 @@ class AdvertisementsController {
 
   async createAd(req: Request, res: Response) {
     const query = `INSERT INTO advertisements 
-      (id, name, description, createdAt, updatedAt, expiresAt, showncount) 
+      (id, name, description, createdAt, updatedAt, expiresAt, shownCount) 
       VALUES (?,?,?,?,?,?,?)`;
 
     const date = new Date();
@@ -40,7 +40,7 @@ class AdvertisementsController {
       req.body.expires
         ? req.body.expires
         : new Date(date.setMonth(date.getMonth() + 1)).toISOString(),
-      0,
+      req.body.shownCount ? req.body.shownCount : 0,
     ];
 
     client.execute(query, params, { prepare: true }, (err, result) => {
@@ -55,10 +55,14 @@ class AdvertisementsController {
 
   async updateAdDesc(req: Request, res: Response) {
     const query = `UPDATE advertisements SET
-      description = ?
+      description = ?, updatedAt = ?
       WHERE id = ?`;
 
-    const params = [req.body.description, req.params.id];
+    const params = [
+      req.body.description,
+      new Date().toISOString(),
+      req.params.id,
+    ];
     client.execute(query, params, { prepare: true }, (err) => {
       if (err) {
         console.error(err);
@@ -71,9 +75,9 @@ class AdvertisementsController {
 
   async updateAdName(req: Request, res: Response) {
     const query = `UPDATE advertisements SET
-      name = ?
+      name = ?, updatedAt = ?
       WHERE id = ?`;
-    const params = [req.body.name, req.params.id];
+    const params = [req.body.name, new Date().toISOString(), req.params.id];
 
     client.execute(query, params, { prepare: true }, (err) => {
       if (err) {
@@ -87,10 +91,14 @@ class AdvertisementsController {
 
   async updateAdShowCount(req: Request, res: Response) {
     const query = `UPDATE advertisements SET
-      showncount = ?
+      shownCount = ?, updatedAt = ?
       WHERE id = ?`;
 
-    const params = [req.body.shownCount, req.params.id];
+    const params = [
+      req.body.shownCount,
+      new Date().toISOString(),
+      req.params.id,
+    ];
 
     client.execute(query, params, { prepare: true }, (err) => {
       if (err) {
@@ -104,10 +112,10 @@ class AdvertisementsController {
 
   async updateAdExpiration(req: Request, res: Response) {
     const query = `UPDATE advertisements SET
-      expires = ?
+      expiresAt = ?, updatedAt = ?
       WHERE id = ?`;
 
-    const params = [req.body.expires, req.params.id];
+    const params = [req.body.expires, new Date().toISOString(), req.params.id];
 
     client.execute(query, params, { prepare: true }, (err) => {
       if (err) {
@@ -126,7 +134,7 @@ class AdvertisementsController {
     client.execute(query, [req.params.id], { prepare: true }, (err) => {
       if (err) {
         console.error(err);
-        res.status(400).json(`Could not delete ad ${req.params.id}!`);
+        res.status(400).json(`Could not delete ad!`);
       } else {
         res.json(`Ad deleted!`);
       }

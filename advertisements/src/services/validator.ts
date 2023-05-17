@@ -33,7 +33,7 @@ export default class Validator {
 
   validateUpdateAdShown = [
     param("id").exists().trim(),
-    body("shownCount").exists().trim().isNumeric,
+    body("shownCount").exists().trim().isNumeric(),
     this.validate,
   ];
 

@@ -45,7 +45,7 @@ class App {
 
   public listen(): void {
     this.app.listen(this.port, () => {
-      console.log(`Server started at http://localhost:${this.port}`);
+      console.log(`Server started on port: ${this.port}`);
     });
   }
 }

@@ -4,6 +4,10 @@ import { redis } from "../services/redis";
 import { isEmpty } from "../utils/emptyObjectChecker";
 
 class CartsController {
+  async getAll(req: Request, res: Response) {
+    const result = await redis.call("keys", "*");
+    res.json(result);
+  }
   async getCart(req: Request, res: Response) {
     const cart = await redis.hgetall(req.params.id);
 
@@ -14,19 +18,19 @@ class CartsController {
     }
   }
 
-  // async getAmountofProduct(req: Request, res: Response) {
-  //   const product = await redis.hget(req.params.id, req.body.productId);
+  async getAmountofProduct(req: Request, res: Response) {
+    const product = await redis.hget(req.params.id, req.body.productId);
 
-  //   if (!isEmpty(product)) {
-  //     res.status(200).json(product);
-  //   } else {
-  //     res
-  //       .status(404)
-  //       .json(
-  //         `Unable to find product ${req.body.productId} in users ${req.params.id} cart`
-  //       );
-  //   }
-  // }
+    if (!isEmpty(product)) {
+      res.status(200).json(product);
+    } else {
+      res
+        .status(404)
+        .json(
+          `Unable to find product ${req.body.productId} in users ${req.params.id} cart`
+        );
+    }
+  }
 
   async createCart(req: Request, res: Response) {
     const cart = await redis.hset(
@@ -53,38 +57,6 @@ class CartsController {
       res.status(404).json(`Unable to find user ${req.params.id}`);
     }
   }
-
-  // async removeOneProduct(req: Request, res: Response) {
-  //   const productAmount = await redis.hget(req.params.id, req.body.productId);
-
-  //   if (productAmount) {
-  //     let numProductAmount = parseInt(productAmount);
-
-  //     if (numProductAmount > 1) {
-  //       await redis.hset(
-  //         req.params.id,
-  //         {
-  //           [req.body.productId]: --numProductAmount,
-  //         },
-  //         (err, result) => {
-  //           if (err) {
-  //             res.status(400).json(`There was an error: ${err}`);
-  //           } else {
-  //             res.json(`${result} products updated`);
-  //           }
-  //         }
-  //       );
-  //     } else {
-  //       await redis.hdel(req.params.id, req.body.productId, (err, result) => {
-  //         if (err) {
-  //           res.status(400).json(`There was an error: ${err}`);
-  //         } else {
-  //           res.json(`${result} products updated`);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
 
   async deleteCart(req: Request, res: Response) {
     const deletedCart = await redis.del(req.params.id);

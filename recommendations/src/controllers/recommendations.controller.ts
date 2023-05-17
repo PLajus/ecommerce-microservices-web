@@ -27,6 +27,20 @@ class RecommendationsController {
     return res.json({ users: users, products: products });
   }
 
+  async getProduct(req: Request, res: Response) {
+    const session = driver.session();
+
+    const result = await session.run(
+      `MATCH (Product {name: $name})-[r]-(User)
+      RETURN User.email, type(r)`,
+      { name: req.params.product }
+    );
+
+    session.close();
+
+    return res.json({ result: result.records.length });
+  }
+
   async getUserRelationships(req: Request, res: Response) {
     const user = req.params.email;
     if (!user) {
@@ -154,8 +168,8 @@ class RecommendationsController {
     const session = driver.session();
 
     const result = await session.run(
-      `MATCH (p:$Product {name: $name})
-      DELETE n`,
+      `MATCH (p:Product {name: $name})
+      DETACH DELETE p`,
       { name: req.params.product }
     );
 

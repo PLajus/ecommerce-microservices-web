@@ -7,8 +7,8 @@ neo4j:
   password: "neo4jpass"
 
   # Uncomment to use enterprise edition
-  edition: "enterprise"
-  acceptLicenseAgreement: "yes"
+  # edition: "enterprise"
+  # acceptLicenseAgreement: "yes"
 
 volumes:
   data:

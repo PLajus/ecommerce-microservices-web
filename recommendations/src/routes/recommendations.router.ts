@@ -10,16 +10,18 @@ router.use(express.json());
 
 router.get("/", recommendations.getAllNodes);
 
-router.get("/:email", recommendations.getUserRelationships);
+router.get("/users/:email", recommendations.getUserRelationships);
 
-router.post("/node", recommendations.createNode);
+router.get("/products/:product", recommendations.getProduct);
 
-router.post("/relationship", recommendations.createRelationship);
+router.post("/nodes", recommendations.createNode);
 
-router.put("/product/:product", recommendations.updateProduct);
+router.post("/relationships", recommendations.createRelationship);
 
-router.delete("/relationship", recommendations.delRelationship);
+router.put("/products/:product", recommendations.updateProduct);
 
-router.delete("/node", recommendations.delNode);
+router.delete("/relationships", recommendations.delRelationship);
 
-router.delete("/node/:product", recommendations.delProductNode);
+router.delete("/nodes", recommendations.delNode);
+
+router.delete("/nodes/:product", recommendations.delProductNode);

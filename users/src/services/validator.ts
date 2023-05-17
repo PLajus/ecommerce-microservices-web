@@ -10,8 +10,7 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
 
 export const validateNewUser = [
   body("email").exists().trim().isEmail(),
-  // body("password").exists().trim().isStrongPassword(),
-  body("password").exists().trim().isString(),
+  body("password").exists().trim().isStrongPassword(),
   validate,
 ];
 
