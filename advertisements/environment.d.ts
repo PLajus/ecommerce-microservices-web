@@ -3,8 +3,6 @@ declare global {
     interface ProcessEnv {
       PORT: number;
       CONTACT_POINT: string;
-      KEYSPACE: string;
-      LOCALDATACENTER: string;
     }
   }
 }

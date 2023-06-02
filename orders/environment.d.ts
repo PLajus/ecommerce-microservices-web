@@ -4,8 +4,6 @@ declare global {
       PORT: number;
       DB: string;
       DB_USER: string;
-      DB_PASS: string;
-      DB_HOST: string;
     }
   }
 }
