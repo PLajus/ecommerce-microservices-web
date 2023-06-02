@@ -8,6 +8,7 @@ docker compose up
 ```
 
 # API endpoints
+`
 /ads
 /carts
 /orders
@@ -15,6 +16,6 @@ docker compose up
 /recs
 /logs
 /users
-
+`
 # Defaults
 port: 80
