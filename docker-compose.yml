@@ -87,8 +87,6 @@ services:
     ports:
       - "8081:8081"
     environment:
-      #   # ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      #   # ME_CONFIG_MONGODB_ADMINPASSWORD: password
       - ME_CONFIG_MONGODB_SERVER=mongo
 
   neo4j:
@@ -116,8 +114,10 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=password
+    command: --init-file /data/application/init.sql
     volumes:
       - "mysql:/var/lib/mysql"
+      - ./scripts/init.sql:/data/application/init.sql
 
   cassandra:
     image: bitnami/cassandra
@@ -125,6 +125,7 @@ services:
     ports:
       - "9042:9042"
     volumes:
+      - ./scripts/init.cql:/docker-entrypoint-initdb.d
       - "cassandra:/bitnami"
 
   nginx:
