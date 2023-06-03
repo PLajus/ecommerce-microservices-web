@@ -34,7 +34,9 @@ services:
     ports:
       - "3003:3000"
     depends_on:
-      - cassandra
+      cassandra:
+        condition: service_healthy
+
     environment:
       - CONTACT_POINT=cassandra
       - KEYSPACE=ecommerce
@@ -55,7 +57,8 @@ services:
     ports:
       - "3005:3000"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - DB=orders
       - DB_USER=root
@@ -117,7 +120,11 @@ services:
     command: --init-file /data/application/init.sql
     volumes:
       - "mysql:/var/lib/mysql"
-      - ./scripts/init.sql:/data/application/init.sql
+      - "./scripts/init.sql:/data/application/init.sql"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
   cassandra:
     image: bitnami/cassandra
@@ -125,8 +132,10 @@ services:
     ports:
       - "9042:9042"
     volumes:
-      - ./scripts/init.cql:/docker-entrypoint-initdb.d
+      - "./scripts:/docker-entrypoint-initdb.d"
       - "cassandra:/bitnami"
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
 
   nginx:
     image: nginx
