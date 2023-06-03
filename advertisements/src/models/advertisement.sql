@@ -1,1 +1,0 @@
-create table ecommerce.advertisements (id uuid PRIMARY KEY, name text, description text, createdAt timestamp, updatedAt timestamp, expiresAt timestamp, shownCount int);

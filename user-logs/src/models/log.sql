@@ -1,1 +1,0 @@
-CREATE TABLE ecommerce.logs (id uuid PRIMARY KEY, user text, createdAt timestamp, request text, params text);
